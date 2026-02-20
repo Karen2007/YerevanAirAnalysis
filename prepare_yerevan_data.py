@@ -11,7 +11,7 @@ def prepare_yerevan_data_pm_2_5():
     # Adding new features
     air_data['time'] = pd.to_datetime(air_data['time'])  # Convert from string to datetime type
     air_data['hour'] = air_data['time'].dt.hour
-    # air_data['is_weekday'] = air_data['time'].dt.dayofweek.apply(lambda x: 1 if x >= 5 else 0)
+    air_data['is_weekday'] = air_data['time'].dt.dayofweek.apply(lambda x: 1 if x >= 5 else 0)
     air_data['is_busy'] = air_data['hour'].apply(lambda y: 1 if (y >= 7 and y <= 10) or
                                                                       (y >= 17 and y <= 20) else 0)
 
@@ -47,6 +47,3 @@ def prepare_yerevan_data_pm_2_5():
     air_data = air_data.drop(columns=['pm10', 'nitrogen_dioxide',  'time', 'pm2_5'])
 
     return air_data
-
-
-
