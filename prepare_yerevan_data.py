@@ -43,6 +43,7 @@ def prepare_yerevan_data_pm_2_5():
 
 
     air_data = air_data.dropna() # The first few rows don't have previous data, so we drop them
+
     air_data = air_data.drop(columns=['pm10', 'nitrogen_dioxide',  'time', 'pm2_5'])
 
     return air_data
