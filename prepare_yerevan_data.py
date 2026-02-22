@@ -130,11 +130,28 @@ def prepare_yerevan_data_nitrogen_dioxide():
     features = pd.read_csv('yerevan_weather_features.csv')
     targets = pd.read_csv('yerevan_air_quality_targets.csv')
 
-    air_data = pd.merge(features, targets, on='time') # Combine the two datasets on the column 'time'
+    air_data = pd.merge(features, targets, on='time')
+
+    air_data['time'] = pd.to_datetime(air_data['time'])
+    air_data['hour'] = air_data['time'].dt.hour
+    air_data['is_busy'] = air_data['hour'].apply(lambda y: 1 if (y >= 7 and y <= 10) or
+                                                                      (y >= 17 and y <= 20) else 0)
+
+    air_data['hour_sin'] = np.sin(2 * np.pi * air_data['hour'] / 24)
+    air_data['hour_cos'] = np.cos(2 * np.pi * air_data['hour'] / 24)
+
+    air_data = air_data.drop(columns=['hour'])
+
+    air_data['temperature_rolling_3h_mean'] = air_data['temperature_2m'].shift(1).rolling(3).mean()
+    air_data['temperature_rolling_6h_mean'] = air_data['temperature_2m'].shift(1).rolling(6).mean()
+    air_data['temperature_rolling_12h_mean'] = air_data['temperature_2m'].shift(1).rolling(12).mean()
+    air_data['temperature_rolling_24h_mean'] = air_data['temperature_2m'].shift(1).rolling(24).mean()
 
     air_data['wind_speed_10m'] = np.log1p(air_data['wind_speed_10m'])
     air_data['pm2_5'] = np.log1p(air_data['pm2_5'])
     air_data['pm10'] = np.log1p(air_data['pm10'])
+
+    air_data = air_data.dropna()
 
     air_data = air_data.drop(columns=['time'])
 
