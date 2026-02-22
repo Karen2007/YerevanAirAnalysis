@@ -125,3 +125,17 @@ def prepare_yerevan_data_pm_10():
     air_data = air_data.drop(columns=['pm10', 'nitrogen_dioxide',  'time', 'pm2_5'])
 
     return air_data
+
+def prepare_yerevan_data_nitrogen_dioxide():
+    features = pd.read_csv('yerevan_weather_features.csv')
+    targets = pd.read_csv('yerevan_air_quality_targets.csv')
+
+    air_data = pd.merge(features, targets, on='time') # Combine the two datasets on the column 'time'
+
+    air_data['wind_speed_10m'] = np.log1p(air_data['wind_speed_10m'])
+    air_data['pm2_5'] = np.log1p(air_data['pm2_5'])
+    air_data['pm10'] = np.log1p(air_data['pm10'])
+
+    air_data = air_data.drop(columns=['time'])
+
+    return air_data
