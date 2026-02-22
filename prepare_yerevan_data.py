@@ -72,7 +72,6 @@ def prepare_yerevan_data_pm_10():
     # Adding new features
     air_data['time'] = pd.to_datetime(air_data['time'])  # Convert from string to datetime type
     air_data['hour'] = air_data['time'].dt.hour
-    # air_data['is_weekday'] = air_data['time'].dt.dayofweek.apply(lambda x: 1 if x >= 5 else 0)
     air_data['is_busy'] = air_data['hour'].apply(lambda y: 1 if (y >= 7 and y <= 10) or
                                                                       (y >= 17 and y <= 20) else 0)
 
@@ -101,15 +100,19 @@ def prepare_yerevan_data_pm_10():
     air_data['wind_speed_lag_2h'] = air_data['wind_speed_10m'].shift(2)
     air_data['wind_speed_lag_3h'] = air_data['wind_speed_10m'].shift(3)
 
+    air_data['wind_speed_delta'] = air_data['wind_speed_10m'] - air_data['wind_speed_lag_1h']
+
+    # Add some rolling window variables
     air_data['temperature_rolling_3h_mean'] = air_data['temperature_2m'].shift(1).rolling(3).mean()
     air_data['temperature_rolling_6h_mean'] = air_data['temperature_2m'].shift(1).rolling(6).mean()
     air_data['temperature_rolling_12h_mean'] = air_data['temperature_2m'].shift(1).rolling(12).mean()
     air_data['temperature_rolling_24h_mean'] = air_data['temperature_2m'].shift(1).rolling(24).mean()
 
-    # Add some rolling window variables
     air_data['pm10_rolling_6h_mean'] = air_data['pm10'].shift(1).rolling(6).mean()
     air_data['pm10_rolling_6h_std'] = air_data['pm10'].shift(1).rolling(6).std()
     air_data['pm10_rolling_12h_mean'] = air_data['pm10'].shift(1).rolling(12).mean()
+
+    air_data['wind_volatility_interaction'] = air_data['wind_speed_10m'] * air_data['pm10_rolling_6h_std']
 
     # Trying out some new variables
     air_data['temp_humidity_2m'] = air_data['temperature_2m'] * air_data['relative_humidity_2m']
